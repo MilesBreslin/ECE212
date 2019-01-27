@@ -1,0 +1,11 @@
+#!/bin/bash
+
+function _write {
+    while read LINE; do
+        {
+            echo "$LINE" | ssh -o ConnectTimeout=5 cecs-ECE212 
+        } &
+    done
+}
+
+_write
