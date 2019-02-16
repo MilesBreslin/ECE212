@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Allow for debugging on a real computer
+if which gpio > /dev/null; then
+    DEBUG=true
+    _GPIO="echo gpio"
+else
+    _GPIO=gpio
+fi
+
+MOTOR_PINS=(12 18)
+
+function init {
+    for pin in ${MOTOR_PINS[@]}; do
+        $_GPIO -g mode $pin pwm
+    done
+    $_GPIO pwm-ms
+    $_GPIO pwmc 192
+    $_GPIO pwmr 2000
+}
+
+# setMotorSpeed <-100..100>
+function setMotorSpeed {
+    local motor_speed="${1//[^0-9]/}"
+    if [ -z "$motor_speed" ] || (($motor_speed<-100)) || (($motor_speed>100)); then
+        motor_speed=0
+    fi
+    for pin in ${MOTOR_PINS[@]}; do
+        $_GPIO -g pwm $pin $((150+$motor_speed/2))
+    done
+}
+
+# moveDistance <distance in seconds> [speed]
+function moveDistance {
+    if ! [ -z "$1" ]; then
+        local direction=+
+        if ! [ -z "${1//[^-]/}" ]; then
+            direction=-
+        fi
+        local distance=${1//[^0-9]/}
+        local speed="${direction}${2:-50}" # speed=[+-]50
+        setMotorSpeed $speed
+        sleep $distance
+        setMotorSpeed 0
+    fi
+}
+
+# readTemperature
+function readTemperature {
+    if which gpio > /dev/null; then     #if is computer?
+        echo -1     ## UNIMPLEMENTED
+    else
+        echo $((65+RANDOM%20))
+    fi
+}
+
+init
+
+while true; do 
+    TEMP=$(readTemperature)
+    echo Temperature=$TEMP $(date %s)       # Log Data
+    if (($TEMP>80)); then   #if temperature is greater than 80F
+        moveDistance -1     # then retreat
+    elif (($TEMP<70)); then
+        moveDistance 1
+    fi
+done
