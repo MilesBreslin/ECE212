@@ -8,6 +8,8 @@ else
     export _GPIO=gpio
 fi
 
+[ -z "$DEBUG" ] || echo DEBUG IS SET >&2
+
 _DHT="sudo AdafruitDHT"
 
 MOTOR_PINS=(12 18)
