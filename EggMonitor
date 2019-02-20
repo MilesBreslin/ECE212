@@ -52,7 +52,7 @@ function moveDistance {
 function readTemperature {
     if which gpio > /dev/null; then     #if is computer?
         AdafruitDHT 11 $DHT_PIN | sed 's/\ .*//;s/.*\=//'
-    else
+    else                                #else spit out random data
         echo $((15+RANDOM%10))
     fi
 }
@@ -67,4 +67,5 @@ while true; do
     elif (($TEMP<20)) && ((POSITION<=-1)); then
         moveDistance 1
     fi
+    sleep 5
 done
