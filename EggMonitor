@@ -3,9 +3,9 @@
 # Allow for debugging on a real computer
 if ! which gpio > /dev/null; then
     DEBUG=true
-    _GPIO="echo gpio"
+    export _GPIO="echo gpio"
 else
-    _GPIO=gpio
+    export _GPIO=gpio
 fi
 
 MOTOR_PINS=(12 18)
@@ -23,12 +23,8 @@ function init {
 
 # setMotorSpeed <-100..100>
 function setMotorSpeed {
-    local motor_speed="${1//[^0-9]/}"
-    if [ -z "$motor_speed" ] || (($motor_speed<-100)) || (($motor_speed>100)); then
-        motor_speed=0
-    fi
     for pin in ${MOTOR_PINS[@]}; do
-        $_GPIO -g pwm $pin $((150+$motor_speed/2))
+        ./setMotor $pin $@
     done
 }
 
