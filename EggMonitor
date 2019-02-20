@@ -9,6 +9,8 @@ else
 fi
 
 MOTOR_PINS=(12 18)
+DHT_PIN=4
+POSITION=0
 
 function init {
     for pin in ${MOTOR_PINS[@]}; do
@@ -42,15 +44,16 @@ function moveDistance {
         setMotorSpeed $speed
         sleep $distance
         setMotorSpeed 0
+        ((POSITION+=distance))
     fi
 }
 
 # readTemperature
 function readTemperature {
     if which gpio > /dev/null; then     #if is computer?
-        echo -1     ## UNIMPLEMENTED
+        AdafruitDHT 11 $DHT_PIN | sed 's/\ .*//;s/.*\=//'
     else
-        echo $((65+RANDOM%20))
+        echo $((15+RANDOM%10))
     fi
 }
 
@@ -59,9 +62,9 @@ init
 while true; do 
     TEMP=$(readTemperature)
     echo Temperature=$TEMP $(date %s)       # Log Data
-    if (($TEMP>80)); then   #if temperature is greater than 80F
+    if (($TEMP>25)) && ((POSITION>=0)); then   #if temperature is greater than 80F
         moveDistance -1     # then retreat
-    elif (($TEMP<70)); then
+    elif (($TEMP<20)) && ((POSITION<=-1)); then
         moveDistance 1
     fi
 done
