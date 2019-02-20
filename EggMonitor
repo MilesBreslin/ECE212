@@ -51,7 +51,7 @@ function moveDistance {
 # readTemperature
 function readTemperature {
     if [ -z "$DEBUG" ]; then     #if is computer?
-        $_DHT 11 $DHT_PIN | sed 's/\ .*//;s/.*\=//'
+        $_DHT 11 $DHT_PIN | sed 's/\..*//;s/.*\=//'
     else                                #else spit out random data
         echo $((15+RANDOM%20))
     fi
