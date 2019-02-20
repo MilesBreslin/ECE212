@@ -7,4 +7,8 @@ motor_speed="${2//[^0-9]/}"
 if [ -z "$motor_speed" ] || (($motor_speed<-100)) || (($motor_speed>100)); then
     motor_speed=0
 fi
-${_GPIO:-gpio} -g pwm $1 $((150+$motor_speed/2))
+if (($motor_speed==0)); then
+    ${_GPIO:-gpio} -g pwm $1 0
+else
+    ${_GPIO:-gpio} -g pwm $1 $((150+$motor_speed/2))
+fi

@@ -9,7 +9,7 @@ else
 fi
 
 MOTOR_PINS=(12 18)
-DHT_PIN=4
+DHT_PIN=14
 POSITION=0
 
 function init {
@@ -23,6 +23,7 @@ function init {
 
 # setMotorSpeed <-100..100>
 function setMotorSpeed {
+    [ -z "$DEBUG" ] || echo "Set Motor Speed to $1" >&2
     for pin in ${MOTOR_PINS[@]}; do
         ./setMotor $pin $@
     done
@@ -37,6 +38,7 @@ function moveDistance {
         fi
         local distance=${1//[^0-9]/}
         local speed="${direction}${2:-50}" # speed=[+-]50
+        [ -z "$DEBUG" ] || echo "Moving $1 distance" >&2
         setMotorSpeed $speed
         sleep $distance
         setMotorSpeed 0
@@ -57,7 +59,9 @@ init
 
 while true; do 
     TEMP=$(readTemperature)
+    TEMP=${TEMP//[^0-9-]/}
     echo Temperature=$TEMP $(date +%s)       # Log Data
+    [ -z "$DEBUG" ] || echo Temperature=$TEMP Position=$POSITION
     if (($TEMP-0>25)) && ((POSITION>=0)); then   #if temperature is greater than 80F
         moveDistance -1     # then retreat
     elif (($TEMP-0<20)) && ((POSITION<=-1)); then
