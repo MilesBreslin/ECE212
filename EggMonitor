@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Allow for debugging on a real computer
-if which gpio > /dev/null; then
+if ! which gpio > /dev/null; then
     DEBUG=true
     _GPIO="echo gpio"
 else
@@ -61,7 +61,7 @@ init
 
 while true; do 
     TEMP=$(readTemperature)
-    echo Temperature=$TEMP $(date %s)       # Log Data
+    echo Temperature=$TEMP $(date +%s)       # Log Data
     if (($TEMP>25)) && ((POSITION>=0)); then   #if temperature is greater than 80F
         moveDistance -1     # then retreat
     elif (($TEMP<20)) && ((POSITION<=-1)); then
