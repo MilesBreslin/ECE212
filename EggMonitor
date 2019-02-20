@@ -58,9 +58,9 @@ init
 while true; do 
     TEMP=$(readTemperature)
     echo Temperature=$TEMP $(date +%s)       # Log Data
-    if (($TEMP>25)) && ((POSITION>=0)); then   #if temperature is greater than 80F
+    if (($TEMP-0>25)) && ((POSITION>=0)); then   #if temperature is greater than 80F
         moveDistance -1     # then retreat
-    elif (($TEMP<20)) && ((POSITION<=-1)); then
+    elif (($TEMP-0<20)) && ((POSITION<=-1)); then
         moveDistance 1
     fi
     sleep 5
